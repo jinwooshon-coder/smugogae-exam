@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<title>학생 기록 보기 — 스무고개 시험준비</title>
+<meta name="theme-color" content="#5A7A82">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="스무고개">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+:root {
+  --primary: #5A7A82;
+  --primary-dark: #3A5C64;
+  --bg: #F0F4F5;
+  --surface: #FFFFFF;
+  --text: #2C3E42;
+  --muted: #6C7E82;
+  --success: #5A8A6C;
+  --warning: #C8940A;
+  --danger: #8B3A3A;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Noto Sans KR", "Malgun Gothic", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+.wrap { max-width: 860px; margin: 0 auto; padding: 24px 16px 60px; }
+header {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: white;
+  padding: 20px 16px;
+  margin: -24px -16px 20px;
+}
+header h1 { margin: 0 0 6px; font-size: 20px; }
+header p { margin: 0; font-size: 13px; opacity: .9; }
+.empty, .card {
+  background: var(--surface);
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  margin-bottom: 16px;
+}
+.empty { text-align: center; color: var(--muted); padding: 60px 20px; }
+.student-bar {
+  display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+  padding: 12px 16px; background: #EEF5F6; border-radius: 10px;
+  margin-bottom: 16px;
+}
+.student-bar .tag {
+  background: var(--primary); color: white; padding: 4px 10px;
+  border-radius: 20px; font-size: 12px; font-weight: 600;
+}
+.student-bar b { color: var(--primary-dark); font-size: 15px; }
+.code-box {
+  background: white; border: 2px dashed var(--primary);
+  padding: 10px 14px; border-radius: 10px;
+  font-family: 'Courier New', monospace; font-size: 18px; font-weight: 700;
+  color: var(--primary); letter-spacing: 3px;
+}
+table {
+  width: 100%; border-collapse: collapse; margin-top: 8px;
+  font-size: 13px;
+}
+th, td {
+  padding: 10px 8px; border-bottom: 1px solid #e7eef0;
+  text-align: left; vertical-align: top;
+}
+th { color: var(--muted); font-size: 12px; font-weight: 600; background: #f7fafb; }
+td.num { text-align: center; }
+.pill {
+  display: inline-block; padding: 2px 8px;
+  border-radius: 12px; font-size: 11px; font-weight: 600;
+}
+.pill.diff-1,.pill.conf-5 { background: #E5F1E7; color: var(--success); }
+.pill.diff-2,.pill.conf-4 { background: #E9F2EC; color: #4a8a5f; }
+.pill.diff-3,.pill.conf-3 { background: #FFF4D0; color: var(--warning); }
+.pill.diff-4,.pill.conf-2 { background: #FBEADB; color: #B47320; }
+.pill.diff-5,.pill.conf-1 { background: #F5DADA; color: var(--danger); }
+.weak { color: var(--danger); font-size: 12px; margin-top: 4px; }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+.btn {
+  padding: 10px 16px; border: none; border-radius: 10px;
+  background: var(--primary); color: white;
+  font-family: inherit; font-size: 13px; font-weight: 600;
+  cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+}
+.btn.secondary { background: #CED9DC; color: var(--text); }
+.btn:hover { opacity: .9; }
+textarea {
+  width: 100%; min-height: 200px; padding: 12px;
+  border: 1px solid #ddd; border-radius: 8px;
+  font-family: 'Courier New', monospace; font-size: 12px;
+}
+.section-label {
+  font-size: 13px; color: var(--muted); font-weight: 600;
+  margin: 20px 0 8px; text-transform: uppercase; letter-spacing: 1px;
+}
+.stats {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px; margin-bottom: 16px;
+}
+.stat {
+  background: #F7FAFB; padding: 12px; border-radius: 10px; text-align: center;
+}
+.stat .v { font-size: 22px; font-weight: 700; color: var(--primary); }
+.stat .l { font-size: 11px; color: var(--muted); }
+.toast {
+  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+  background: var(--text); color: white;
+  padding: 10px 18px; border-radius: 20px; font-size: 13px;
+  opacity: 0; transition: opacity .3s; pointer-events: none;
+}
+.toast.show { opacity: 0.95; }
+@media (max-width: 640px) {
+  th, td { padding: 8px 4px; font-size: 12px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>학생 기록 보기</h1>
+    <p>학생이 보낸 링크를 받으시면 여기서 기록이 자동으로 펼쳐집니다.</p>
+  </header>
+
+  <div id="content"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 2000);
+}
+
+function parseHash() {
+  var h = window.location.hash || '';
+  var m = h.match(/[#&]d=([^&]+)/);
+  if (!m) return null;
+  try {
+    var b64 = decodeURIComponent(m[1]);
+    var json = decodeURIComponent(escape(atob(b64)));
+    return JSON.parse(json);
+  } catch(e) {
+    console.error(e);
+    return null;
+  }
+}
+
+function avg(arr, k) {
+  var v = arr.filter(function(x){ return x.rpt && x.rpt[k]; }).map(function(x){ return x.rpt[k]; });
+  if (!v.length) return '-';
+  return (v.reduce(function(a,b){return a+b;}, 0) / v.length).toFixed(1);
+}
+
+function fmtDate(iso) {
+  try {
+    var d = new Date(iso);
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  } catch(e) { return '-'; }
+}
+
+function methodLabel(m) {
+  return {'public':'공개자료','upload':'내 교과서','both':'둘 다'}[m] || m || '-';
+}
+function aiLabel(a) {
+  return {'gemini':'Gemini','chatgpt':'ChatGPT','teacher':'선생님','own':'본인 AI','yeon':'연서버'}[a] || a || '-';
+}
+
+function render() {
+  var data = parseHash();
+  var content = document.getElementById('content');
+
+  if (!data) {
+    content.innerHTML = '<div class="empty">'
+      + '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#6C7E82" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:12px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'
+      + '<div style="font-size:15px;margin-bottom:8px;">전달된 데이터가 없습니다</div>'
+      + '<div style="font-size:13px;">학생이 "선생님께 전달 → 링크로 보내기"로 만든 링크를 받으시면<br>이 페이지에서 자동으로 내용이 펼쳐집니다.</div>'
+      + '<div style="margin-top:20px;font-size:12px;color:#9ba;">또는 학생에게서 받은 JSON을 직접 붙여넣어 볼 수 있습니다:</div>'
+      + '<textarea id="pasteArea" placeholder="여기에 학생이 보낸 JSON을 붙여넣기..."></textarea>'
+      + '<div style="margin-top:8px;"><button class="btn" onclick="tryPaste()">불러오기</button></div>'
+      + '</div>';
+    return;
+  }
+
+  var stu = data.student || {};
+  var recs = data.records || [];
+
+  var subjectCount = {};
+  recs.forEach(function(r){
+    var subs = (r.sub||'').split('/').filter(Boolean);
+    subs.forEach(function(s){ subjectCount[s] = (subjectCount[s]||0) + 1; });
+  });
+
+  var html = '';
+  html += '<div class="student-bar">';
+  html += '<span class="tag">' + (stu.g || '-') + '</span>';
+  html += '<b>' + (stu.n || '이름 미입력') + '</b>';
+  html += '<span style="color:var(--muted);">' + (stu.s || '-') + '</span>';
+  html += '<div style="flex:1"></div>';
+  html += '<div class="code-box">' + (data.code || '------') + '</div>';
+  html += '</div>';
+
+  html += '<div class="stats">';
+  html += '<div class="stat"><div class="v">' + recs.length + '</div><div class="l">누적 기록</div></div>';
+  html += '<div class="stat"><div class="v">' + Object.keys(subjectCount).length + '</div><div class="l">과목 수</div></div>';
+  html += '<div class="stat"><div class="v">' + avg(recs,'diff') + '</div><div class="l">평균 난이도</div></div>';
+  html += '<div class="stat"><div class="v">' + avg(recs,'conf') + '</div><div class="l">평균 이해도</div></div>';
+  html += '</div>';
+
+  html += '<div class="card">';
+  html += '<div class="section-label">학습 기록</div>';
+  html += '<table><thead><tr>'
+       + '<th>날짜</th><th>과목</th><th>출판사</th><th>방법</th><th>AI</th>'
+       + '<th>난이도</th><th>이해도</th><th>부족한 부분</th></tr></thead><tbody>';
+  recs.slice().reverse().forEach(function(r){
+    var d = r.rpt || {};
+    html += '<tr>';
+    html += '<td class="num">' + fmtDate(r.t) + '</td>';
+    html += '<td><b>' + (r.sub || '-') + '</b></td>';
+    html += '<td>' + (r.pub || '-') + '</td>';
+    html += '<td>' + methodLabel(r.mth) + '</td>';
+    html += '<td>' + aiLabel(r.ai) + (r.eng ? '→' + aiLabel(r.eng) : '') + '</td>';
+    html += '<td class="num">' + (d.diff ? '<span class="pill diff-' + d.diff + '">' + d.diff + '/5</span>' : '-') + '</td>';
+    html += '<td class="num">' + (d.conf ? '<span class="pill conf-' + d.conf + '">' + d.conf + '/5</span>' : '-') + '</td>';
+    html += '<td>' + (d.weak ? '<span class="weak">' + escapeHtml(d.weak) + '</span>' : '-') + '</td>';
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  html += '</div>';
+
+  // 연플래너 연동용 JSON 박스
+  html += '<div class="card">';
+  html += '<div class="section-label">연플래너 등록용 JSON</div>';
+  html += '<p style="font-size:13px;color:var(--muted);margin:0 0 8px;">이 JSON을 연플래너 "시험 학습 분석" 화면의 가져오기 창에 붙여넣으시면 자동 등록됩니다.</p>';
+  html += '<textarea id="jsonOut" readonly>' + escapeHtml(JSON.stringify(data, null, 2)) + '</textarea>';
+  html += '<div class="actions">';
+  html += '<button class="btn" onclick="copyJson()">JSON 복사</button>';
+  html += '<button class="btn secondary" onclick="downloadJson()">파일 저장</button>';
+  html += '<button class="btn secondary" onclick="printPage()">인쇄</button>';
+  html += '</div>';
+  html += '</div>';
+
+  html += '<p style="text-align:center;color:var(--muted);font-size:12px;margin-top:24px;">'
+       + '내보낸 시각: ' + fmtDate(data.exportedAt) + ' · 스키마 v' + (data.version || '1.0')
+       + '</p>';
+
+  content.innerHTML = html;
+}
+
+function escapeHtml(s) {
+  return String(s||'').replace(/[&<>"]/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];
+  });
+}
+
+function copyJson() {
+  var ta = document.getElementById('jsonOut');
+  ta.select();
+  navigator.clipboard.writeText(ta.value).then(function(){
+    showToast('JSON 복사 완료');
+  }, function(){
+    document.execCommand('copy');
+    showToast('JSON 복사 완료');
+  });
+}
+
+function downloadJson() {
+  var ta = document.getElementById('jsonOut');
+  var blob = new Blob([ta.value], {type:'application/json'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'student-record-' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+}
+
+function printPage() {
+  window.print();
+}
+
+function tryPaste() {
+  var t = document.getElementById('pasteArea').value.trim();
+  try {
+    // JSON 헤더 있는 경우 제거
+    var i = t.indexOf('{');
+    if (i > 0) t = t.slice(i);
+    var obj = JSON.parse(t);
+    var json = JSON.stringify(obj);
+    var b64 = btoa(unescape(encodeURIComponent(json)));
+    window.location.hash = '#d=' + b64;
+    render();
+  } catch(e) {
+    showToast('JSON 형식이 올바르지 않아요');
+  }
+}
+
+window.addEventListener('hashchange', render);
+render();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('./sw.js').catch(function(){});
+  });
+}
+</script>
+</body>
+</html>

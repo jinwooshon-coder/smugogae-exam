@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>교과서 및 시험지 촬영 가이드</title>
+<meta name="theme-color" content="#5A7A82">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="스무고개">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F0F4F5;
+  --surface: #D4E0E3;
+  --primary: #5A7A82;
+  --muted: #A8B5B8;
+  --text: #2C3E42;
+  --text-light: #6B8A90;
+  --success: #6B8F71;
+  --error: #8F6B6B;
+  --gold: #C8940A;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+.page { display: none; }
+.page.active { display: block; }
+.wrap { max-width: 640px; margin: 0 auto; padding: 0 16px 56px; }
+
+/* 앱바 */
+.appbar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 16px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--surface);
+  position: sticky; top: 0; z-index: 100;
+}
+.appbar .back {
+  background: none; border: none; cursor: pointer;
+  color: var(--primary); font-size: 22px; line-height: 1;
+  padding: 4px 10px 4px 0;
+}
+.appbar h2 { font-size: 16px; font-weight: 700; }
+
+/* ── 메인 히어로 ── */
+.hero {
+  background: linear-gradient(160deg, #3A5C64 0%, #5A7A82 100%);
+  color: white;
+  padding: 38px 24px 34px;
+  text-align: center;
+}
+.hero .badge {
+  display: inline-block;
+  background: rgba(255,255,255,0.18);
+  border-radius: 20px;
+  padding: 4px 14px;
+  font-size: 12px; font-weight: 500;
+  margin-bottom: 14px; letter-spacing: 0.04em;
+}
+.hero h1 { font-size: 23px; font-weight: 700; line-height: 1.35; margin-bottom: 10px; }
+.hero p  { font-size: 13.5px; opacity: 0.86; font-weight: 300; line-height: 1.75; }
+
+/* 훅 배너 */
+.hook-banner {
+  margin: 20px 0 6px;
+  background: white;
+  border-radius: 14px;
+  padding: 16px 18px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  display: flex; gap: 12px; align-items: flex-start;
+}
+.hook-icon { font-size: 30px; flex-shrink: 0; }
+.hook-text h3 { font-size: 13.5px; font-weight: 700; color: var(--gold); margin-bottom: 4px; }
+.hook-text p  { font-size: 13px; color: var(--text-light); line-height: 1.6; }
+
+/* 요약 카드 */
+.summary-label {
+  font-size: 11.5px; font-weight: 700; color: var(--muted);
+  letter-spacing: 0.06em; text-transform: uppercase;
+  margin: 22px 0 10px;
+}
+.summary-card {
+  background: white;
+  border-radius: 14px;
+  padding: 16px 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+  margin-bottom: 10px;
+  display: flex; align-items: center; gap: 14px;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  border: none; width: 100%; text-align: left;
+}
+.summary-card:hover  { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+.summary-card:active { transform: scale(0.98); }
+.sc-icon {
+  width: 48px; height: 48px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; flex-shrink: 0;
+}
+.sc-icon.green { background: #EBF5EC; }
+.sc-icon.amber { background: #FDF6E3; }
+.sc-icon.blue  { background: #E8F0F2; }
+.sc-icon.rose  { background: #F5ECEC; }
+.sc-body { flex: 1; }
+.sc-body h3 { font-size: 15px; font-weight: 700; margin-bottom: 3px; }
+.sc-body p  { font-size: 12.5px; color: var(--text-light); line-height: 1.5; }
+.sc-hook { font-size: 11.5px; font-weight: 600; color: var(--gold); margin-top: 5px; }
+.sc-arrow { color: var(--muted); font-size: 20px; flex-shrink: 0; }
+
+/* ── 상세 공통 ── */
+.detail-hero {
+  padding: 30px 20px 24px;
+  text-align: center;
+}
+.detail-hero .d-icon { font-size: 48px; display: block; margin-bottom: 10px; }
+.detail-hero h2 { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+.detail-hero p  { font-size: 13px; color: var(--text-light); line-height: 1.65; }
+
+/* 얼굴 연결 배너 */
+.face-banner {
+  border-radius: 12px; padding: 14px 16px;
+  margin-bottom: 18px;
+  font-size: 13px; line-height: 1.6;
+  display: flex; gap: 10px; align-items: flex-start;
+}
+.face-banner.green { background: #EBF5EC; }
+.face-banner.amber { background: #FDF6E3; }
+.face-banner.blue  { background: #E8F0F2; }
+.face-banner .fb-i { font-size: 20px; flex-shrink: 0; }
+.face-banner strong { color: var(--primary); font-weight: 700; }
+
+/* 섹션 타이틀 */
+.sec-t {
+  font-size: 12px; font-weight: 700; color: var(--primary);
+  letter-spacing: 0.05em; text-transform: uppercase;
+  margin: 22px 0 10px;
+  display: flex; align-items: center; gap: 6px;
+}
+.sec-t::after { content: ''; flex: 1; height: 1px; background: var(--surface); }
+
+/* 카드 */
+.card {
+  background: white; border-radius: 12px;
+  padding: 16px 18px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+  margin-bottom: 10px;
+}
+
+/* 상황 카드 */
+.sit-card {
+  background: white; border-radius: 12px;
+  padding: 15px 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+  margin-bottom: 10px;
+  border-left: 4px solid var(--primary);
+  display: flex; gap: 14px; align-items: flex-start;
+}
+.sit-card.c1 { border-left-color: #6B8F71; }
+.sit-card.c2 { border-left-color: #C8940A; }
+.sit-card .si { font-size: 26px; flex-shrink: 0; line-height: 1; margin-top: 2px; }
+.sit-card h3  { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+.sit-card p   { font-size: 13px; color: var(--text-light); line-height: 1.55; }
+.tag {
+  display: inline-block; background: var(--bg);
+  border-radius: 6px; padding: 2px 8px;
+  font-size: 11.5px; font-weight: 500; color: var(--text); margin-top: 6px;
+}
+
+/* 팁 행 */
+.tip-row {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--bg);
+}
+.tip-row:last-child { border-bottom: none; padding-bottom: 0; }
+.tip-num {
+  width: 26px; height: 26px;
+  background: var(--primary); color: white;
+  border-radius: 50%; font-size: 12px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: 1px;
+}
+.tip-text strong { font-weight: 600; display: block; font-size: 14px; margin-bottom: 2px; }
+.tip-text span   { font-size: 12.5px; color: var(--text-light); }
+
+/* 체크 그리드 */
+.cg { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom:10px; }
+.cb { border-radius: 10px; padding: 14px; }
+.cb.bad  { background: #FDF0F0; }
+.cb.good { background: #F0F6F1; }
+.cb h4 { font-size: 12px; font-weight: 700; margin-bottom: 8px; }
+.cb.bad  h4 { color: var(--error); }
+.cb.good h4 { color: var(--success); }
+.cb ul { list-style: none; }
+.cb ul li {
+  font-size: 12.5px; color: var(--text);
+  padding: 3px 0; display: flex; align-items: flex-start;
+  gap: 5px; line-height: 1.45;
+}
+.cb.bad  ul li::before { content: '✕'; color: var(--error);   font-size:11px; font-weight:700; flex-shrink:0; }
+.cb.good ul li::before { content: '✓'; color: var(--success); font-size:11px; font-weight:700; flex-shrink:0; }
+
+/* 테이블 */
+.ct { width: 100%; border-collapse: collapse; font-size: 13px; }
+.ct th { background: var(--surface); text-align: left; padding: 9px 12px; font-size: 12px; font-weight: 700; color: var(--primary); }
+.ct td { padding: 9px 12px; border-bottom: 1px solid var(--bg); }
+.ct tr:last-child td { border-bottom: none; }
+.bok { display:inline-block; background:#EBF5EC; color:#4A7A50; border-radius:6px; padding:1px 8px; font-size:11.5px; font-weight:600; }
+.bng { display:inline-block; background:#F5ECEC; color:#8F6B6B; border-radius:6px; padding:1px 8px; font-size:11.5px; font-weight:600; }
+
+/* 요약 배너 */
+.sum-b {
+  background: var(--primary); color: white;
+  border-radius: 12px; padding: 20px 20px; margin-bottom: 14px;
+}
+.sum-b p { font-size: 14.5px; line-height: 1.8; }
+.sum-b strong { font-weight: 700; }
+</style>
+</head>
+<body>
+
+<!-- ══════ 메인 ══════ -->
+<div id="pg-main" class="page active">
+  <div class="hero">
+    <div class="badge">📚 연플래닝 학습 가이드</div>
+    <h1>교과서 및 시험지<br>촬영 가이드</h1>
+    <p>AI가 잘 읽도록 찍는 법 3가지.<br>사실 이건 셀카도 이쁘게 나오는<br>빛의 원리와 완전히 같습니다.</p>
+  </div>
+
+  <div class="wrap">
+    <div class="hook-banner">
+      <div class="hook-icon">✨</div>
+      <div class="hook-text">
+        <h3>이 가이드의 숨겨진 비밀</h3>
+        <p>교과서를 잘 찍는 원리는 <strong>내 얼굴과 친구 사진을 이쁘게 찍는 원리와 정확히 같습니다.</strong> 각 파트마다 그 연결고리를 알려드립니다.</p>
+      </div>
+    </div>
+
+    <div class="summary-label">파트별 요약 — 자세히 보려면 탭하세요</div>
+
+    <button class="summary-card" onclick="go('pg-light')">
+      <div class="sc-icon green">☁️</div>
+      <div class="sc-body">
+        <h3>01 · 빛 조건 고르기</h3>
+        <p>흐린 날 밖, 밝은 그림자 안, 실내 반사 확인 — 상황별 3가지</p>
+        <div class="sc-hook">💡 얼굴 사진이 이쁜 빛도 이것과 같습니다 →</div>
+      </div>
+      <span class="sc-arrow">›</span>
+    </button>
+
+    <button class="summary-card" onclick="go('pg-angle')">
+      <div class="sc-icon amber">📐</div>
+      <div class="sc-body">
+        <h3>02 · 각도와 거리</h3>
+        <p>멀리서 광학 줌, 수직 정면, 제본 처리 — 촬영 방법 5단계</p>
+        <div class="sc-hook">💡 셀카 각도가 얼굴형을 바꾸는 이유도 여기 있습니다 →</div>
+      </div>
+      <span class="sc-arrow">›</span>
+    </button>
+
+    <button class="summary-card" onclick="go('pg-check')">
+      <div class="sc-icon blue">✅</div>
+      <div class="sc-body">
+        <h3>03 · 해도 됨 vs 안 됨</h3>
+        <p>플래시, 디지털 줌, 비스듬한 각도 — 흔한 실수 체크리스트</p>
+        <div class="sc-hook">💡 인스타 사진에서 피해야 할 것들과 같습니다 →</div>
+      </div>
+      <span class="sc-arrow">›</span>
+    </button>
+
+    <button class="summary-card" onclick="go('pg-final')">
+      <div class="sc-icon rose">🎯</div>
+      <div class="sc-body">
+        <h3>04 · 핵심 한 줄 요약</h3>
+        <p>모든 것을 한 문장으로 — 찍기 전 이것 하나만 확인</p>
+        <div class="sc-hook">💡 이 한 줄이 사진 실력의 전부입니다 →</div>
+      </div>
+      <span class="sc-arrow">›</span>
+    </button>
+
+    <button class="summary-card" onclick="go('pg-cam')">
+      <div class="sc-icon" style="background:#EEF0FB;">📱</div>
+      <div class="sc-body">
+        <h3>05 · 캠스캐너 앱 활용하기</h3>
+        <p>자동 보정·문서 스캔 전문 앱 — 단, 기본 촬영 요령은 똑같이 필요</p>
+        <div class="sc-hook">⚠️ 앱이 만능은 아닙니다. 찍는 요령을 먼저 익히세요 →</div>
+      </div>
+      <span class="sc-arrow">›</span>
+    </button>
+  </div>
+</div>
+
+
+<!-- ══════ 01 빛 조건 ══════ -->
+<div id="pg-light" class="page">
+  <div class="appbar">
+    <button class="back" onclick="go('pg-main')">‹</button>
+    <h2>01 · 빛 조건 고르기</h2>
+  </div>
+  <div class="detail-hero">
+    <span class="d-icon">☁️</span>
+    <h2>빛이 전부입니다</h2>
+    <p>사진이 하얗게 날아가거나 글씨가 뭉개지는 이유는<br>전부 빛 때문입니다. 상황에 맞는 조건만 고르면 됩니다.</p>
+  </div>
+  <div class="wrap">
+    <div class="face-banner green">
+      <div class="fb-i">🤳</div>
+      <div><strong>얼굴 사진과 같은 원리입니다.</strong><br>
+      야외 인물사진이 흐린 날에 제일 잘 나오는 이유, 창가 빛이 셀카에 좋은 이유 — 직사광선을 피하고 확산된 빛을 쓰는 것이 핵심입니다.</div>
+    </div>
+
+    <div class="sec-t">상황별 조건</div>
+
+    <div class="sit-card c1">
+      <div class="si">☁️</div>
+      <div>
+        <h3>흐린 날 → 밖에서 그냥 찍기</h3>
+        <p>구름 전체가 거대한 소프트박스 역할. 반사가 생길 직사광이 없어서 어디서 찍어도 깔끔하게 나옴.</p>
+        <span class="tag">조건 신경 쓸 것 없음 — 최적</span>
+      </div>
+    </div>
+
+    <div class="sit-card c2">
+      <div class="si">☀️</div>
+      <div>
+        <h3>맑은 날 → 밝은 그림자 안에서 찍기</h3>
+        <p>건물 그늘, 처마 아래, 나무 그늘 — 직사광은 차단, 주변 반사광은 충분. 반사 자체가 생기지 않는 조건.</p>
+        <span class="tag">건물 그늘 / 처마 아래 / 나무 그늘</span>
+      </div>
+    </div>
+
+    <div class="sit-card">
+      <div class="si">💡</div>
+      <div>
+        <h3>실내 → 반사 없는 위치 찾아서 찍기</h3>
+        <p>거실 조명 켠 상태에서 카메라로 교과서를 보며, 화면에 빛이 하얗게 반사되지 않는 위치를 찾으면 됨. 그 자리에서 찍기.</p>
+        <span class="tag">반사 없으면 어떤 각도든 OK</span>
+      </div>
+    </div>
+
+    <div class="sec-t">왜 이 방법인가요</div>
+    <div class="card">
+      <p style="font-size:13.5px; color:var(--text-light); line-height:1.8;">
+        세 조건의 공통점은 하나입니다 —
+        <strong style="color:var(--text)">직사광이 없는 확산광 상태</strong>.<br>
+        빛이 한 방향에서 강하게 오지 않으니 교과서 표면에서 카메라 방향으로 반사가 일어나지 않습니다. 프로 사진작가들이 소프트박스를 쓰는 이유와 정확히 같습니다.
+      </p>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════ 02 각도와 거리 ══════ -->
+<div id="pg-angle" class="page">
+  <div class="appbar">
+    <button class="back" onclick="go('pg-main')">‹</button>
+    <h2>02 · 각도와 거리</h2>
+  </div>
+  <div class="detail-hero">
+    <span class="d-icon">📐</span>
+    <h2>각도가 결과를 바꿉니다</h2>
+    <p>빛 조건이 맞았다면 다음은 각도와 거리입니다.<br>AI가 글씨를 잘 읽으려면 왜곡이 없어야 합니다.</p>
+  </div>
+  <div class="wrap">
+    <div class="face-banner amber">
+      <div class="fb-i">🤳</div>
+      <div><strong>셀카 각도와 같은 원리입니다.</strong><br>
+      셀카를 약간 위에서 아래로 찍으면 얼굴이 작아 보이는 이유 — 카메라 위치와 거리가 왜곡을 결정합니다. 교과서도 각도에 따라 글씨가 왜곡됩니다.</div>
+    </div>
+
+    <div class="sec-t">촬영 방법 5단계</div>
+    <div class="card">
+      <div class="tip-row">
+        <div class="tip-num">1</div>
+        <div class="tip-text">
+          <strong>멀리서 광학 줌으로 당겨 찍기</strong>
+          <span>광각 렌즈는 가까이서 찍으면 가장자리가 휘어짐. 2~3배 광학 줌으로 멀리서 당기면 왜곡 없이 반듯하게. 디지털 줌은 화질이 깨지므로 금지.</span>
+        </div>
+      </div>
+      <div class="tip-row">
+        <div class="tip-num">2</div>
+        <div class="tip-text">
+          <strong>카메라 수직 정면으로</strong>
+          <span>AI가 글씨를 읽으려면 기울어지면 안 됨. 교과서 정면에서 수직으로 내려다보는 각도 유지.</span>
+        </div>
+      </div>
+      <div class="tip-row">
+        <div class="tip-num">3</div>
+        <div class="tip-text">
+          <strong>접힌 부분은 눌러서 펴고 찍기</strong>
+          <span>제본 가운데 접히는 부분은 손이나 지우개로 살짝 눌러 평평하게. 안 펴지면 두 페이지 따로 찍기.</span>
+        </div>
+      </div>
+      <div class="tip-row">
+        <div class="tip-num">4</div>
+        <div class="tip-text">
+          <strong>볼륨 버튼으로 찍기</strong>
+          <span>화면 탭보다 볼륨 버튼으로 찍으면 손 흔들림이 줄어듦. 팔꿈치를 책상에 붙이면 더 안정적.</span>
+        </div>
+      </div>
+      <div class="tip-row">
+        <div class="tip-num">5</div>
+        <div class="tip-text">
+          <strong>찍고 나서 배경 잘라내기</strong>
+          <span>책상, 손 등 주변 배경은 크롭으로 제거. 교과서 내용만 꽉 차게 자르면 AI 인식률 올라감.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════ 03 체크리스트 ══════ -->
+<div id="pg-check" class="page">
+  <div class="appbar">
+    <button class="back" onclick="go('pg-main')">‹</button>
+    <h2>03 · 해도 됨 vs 안 됨</h2>
+  </div>
+  <div class="detail-hero">
+    <span class="d-icon">✅</span>
+    <h2>흔한 실수 체크</h2>
+    <p>잘 찍는 방법보다 이것만 안 해도<br>사진 퀄리티가 확 달라집니다.</p>
+  </div>
+  <div class="wrap">
+    <div class="face-banner blue">
+      <div class="fb-i">🤳</div>
+      <div><strong>인스타 인물사진에서 피해야 할 것과 같습니다.</strong><br>
+      플래시 ON 셀카가 어색하게 나오는 이유, 너무 가까이서 찍으면 코가 커 보이는 이유 — 교과서 실수 목록과 원리가 같습니다.</div>
+    </div>
+
+    <div class="sec-t">체크리스트</div>
+    <div class="cg">
+      <div class="cb bad">
+        <h4>✕ 하면 안 됨</h4>
+        <ul>
+          <li>유광 교과서에 플래시</li>
+          <li>45도 비스듬히 찍기</li>
+          <li>누워서 천장 향해 찍기</li>
+          <li>문제 몰아서 찍기</li>
+          <li>스크린샷으로 대체</li>
+          <li>디지털 줌 사용</li>
+        </ul>
+      </div>
+      <div class="cb good">
+        <h4>✓ 이렇게 하면 됨</h4>
+        <ul>
+          <li>흐린 날 밖에서 찍기</li>
+          <li>밝은 그림자 안에서</li>
+          <li>반사 없는 자리 확인</li>
+          <li>광학 줌 2~3배 사용</li>
+          <li>수직 정면 유지</li>
+          <li>문제 하나씩 클로즈업</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="sec-t">상황별 플래시 OK / NG</div>
+    <div class="card" style="padding:0; overflow:hidden;">
+      <table class="ct">
+        <thead>
+          <tr><th>상황</th><th>플래시</th><th>이유</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>무광 교과서</td><td><span class="bok">OK</span></td><td style="font-size:12.5px;">그림자 줄어드는 효과</td></tr>
+          <tr><td>유광(코팅) 교과서</td><td><span class="bng">NG</span></td><td style="font-size:12.5px;">반사 심해서 글씨 날아감</td></tr>
+          <tr><td>시험지 (일반 종이)</td><td><span class="bok">OK</span></td><td style="font-size:12.5px;">무광이라 대부분 괜찮음</td></tr>
+          <tr><td>칠판·화이트보드</td><td><span class="bng">NG</span></td><td style="font-size:12.5px;">항상 반사 — 절대 금지</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════ 04 핵심 요약 ══════ -->
+<div id="pg-final" class="page">
+  <div class="appbar">
+    <button class="back" onclick="go('pg-main')">‹</button>
+    <h2>04 · 핵심 한 줄 요약</h2>
+  </div>
+  <div class="detail-hero">
+    <span class="d-icon">🎯</span>
+    <h2>이것 하나만 기억하세요</h2>
+    <p>조건, 각도, 거리 — 모든 것이 이 한 문장으로 압축됩니다.</p>
+  </div>
+  <div class="wrap">
+    <div class="sum-b">
+      <p>
+        <strong>빛이 교과서에서 반사돼 카메라로 들어오지 않는 자리</strong>를 찾으세요.<br><br>
+        그 자리에서, 멀리서 광학 줌으로<br>수직 정면으로 찍으면 끝입니다.
+      </p>
+    </div>
+
+    <div class="face-banner green">
+      <div class="fb-i">🤳</div>
+      <div><strong>얼굴 사진에 그대로 적용됩니다.</strong><br>
+      친구 얼굴에 조명이 반사돼 번들거리지 않는 위치를 찾아서, 약간 멀리서 당겨 찍으세요. 그게 전부입니다. 교과서나 사람이나 빛의 원리는 같습니다.</div>
+    </div>
+
+    <div class="sec-t">찍기 전 3초 체크</div>
+    <div class="card">
+      <div class="tip-row">
+        <div class="tip-num">1</div>
+        <div class="tip-text">
+          <strong>화면에 빛 반사 보이나요?</strong>
+          <span>있으면 → 자리 바꾸거나 각도 틀기</span>
+        </div>
+      </div>
+      <div class="tip-row">
+        <div class="tip-num">2</div>
+        <div class="tip-text">
+          <strong>광학 줌으로 설정했나요?</strong>
+          <span>디지털 줌이면 → 광학 줌 범위로 돌아오기</span>
+        </div>
+      </div>
+      <div class="tip-row">
+        <div class="tip-num">3</div>
+        <div class="tip-text">
+          <strong>수직 정면인가요?</strong>
+          <span>기울어졌으면 → 정면으로 잡고 찍기</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ 05 캠스캐너 ══════ -->
+<div id="pg-cam" class="page">
+  <div class="appbar">
+    <button class="back" onclick="go('pg-main')">‹</button>
+    <h2>05 · 캠스캐너 앱 활용하기</h2>
+  </div>
+  <div class="detail-hero">
+    <span class="d-icon">📱</span>
+    <h2>캠스캐너, 유용하지만<br>기본기가 먼저입니다</h2>
+    <p>선생님도 실제로 쓰고 있는 앱입니다.<br>단, 앱이 모든 걸 해결해주지는 않습니다.</p>
+  </div>
+  <div class="wrap">
+
+    <div class="face-banner" style="background:#EEF0FB;">
+      <div class="fb-i">⚠️</div>
+      <div><strong>앱보다 찍는 요령이 먼저입니다.</strong><br>
+      캠스캐너는 이미 잘 찍힌 사진을 더 좋게 만들어주는 도구입니다. 빛이 반사된 사진, 심하게 기울어진 사진은 앱도 살려내지 못합니다. 01~04 파트의 촬영 요령을 먼저 익혀두세요.</div>
+    </div>
+
+    <div class="sec-t">캠스캐너란</div>
+    <div class="card">
+      <div class="tip-row">
+        <div class="tip-num">✦</div>
+        <div class="tip-text">
+          <strong>문서 스캔 전문 앱 (무료)</strong>
+          <span>교과서·시험지·노트를 찍으면 자동으로 왜곡 보정 + 밝기 조절 + 문서 영역만 크롭해줌. iOS·안드로이드 모두 지원.</span>
+        </div>
+      </div>
+      <div class="tip-row">
+        <div class="tip-num">✦</div>
+        <div class="tip-text">
+          <strong>캠스캐너가 해주는 것</strong>
+          <span>자동 문서 경계 인식 · 원근 왜곡 보정 · 흑백/컬러 필터 · PDF 변환 · 텍스트 선명화</span>
+        </div>
+      </div>
+      <div class="tip-row">
+        <div class="tip-num">✦</div>
+        <div class="tip-text">
+          <strong>캠스캐너가 못 해주는 것</strong>
+          <span>빛 반사로 날아간 부분 복원 · 극심한 흔들림 보정 · 접힌 그림자 제거. 이건 찍는 사람이 해결해야 함.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-t">간단 사용법</div>
+    <div class="card">
+      <div class="tip-row">
+        <div class="tip-num">1</div>
+        <div class="tip-text">
+          <strong>앱 실행 → 카메라 아이콘 탭</strong>
+          <span>화면에 노란 테두리가 자동으로 문서 영역을 감지함.</span>
+        </div>
+      </div>
+      <div class="tip-row">
+        <div class="tip-num">2</div>
+        <div class="tip-text">
+          <strong>노란 테두리가 교과서 전체를 감쌀 때 찍기</strong>
+          <span>테두리가 맞지 않으면 → 거리 조절하거나 각도 바꾸기.</span>
+        </div>
+      </div>
+      <div class="tip-row">
+        <div class="tip-num">3</div>
+        <div class="tip-text">
+          <strong>필터 선택 → '문서' 또는 '선명' 모드</strong>
+          <span>수학 문제지는 흑백 선명 모드, 컬러 도표가 있으면 컬러 모드 사용.</span>
+        </div>
+      </div>
+      <div class="tip-row">
+        <div class="tip-num">4</div>
+        <div class="tip-text">
+          <strong>저장 후 수학 AI 앱에 업로드</strong>
+          <span>캠스캐너에서 바로 공유 → 갤러리 저장 → 앱 업로드 순서.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sum-b" style="background:#4A5A8A;">
+      <p>
+        <strong>결론 :</strong> 캠스캐너는 좋은 도구입니다.<br>
+        하지만 빛 조건, 각도, 거리의 기본기를 익힌 다음 쓰면 훨씬 좋은 결과가 나옵니다.<br><br>
+        <strong>상세 사용 가이드는 별도 문서로 제공됩니다.</strong>
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function go(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('./sw.js').catch(function(){});
+  });
+}
+</script>
+</body>
+</html>

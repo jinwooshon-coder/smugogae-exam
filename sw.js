@@ -1,6 +1,6 @@
 /* 스무고개 시험준비 PWA — Service Worker
  * 전략: cache-first (navigation은 network-first로 최신 유지)
- * 버전 윬릴 때 CACHE_VERSION 증가 → 자동 재설치
+ * 버전 올릴 때 CACHE_VERSION 증가 → 자동 재설치
  */
 const CACHE_VERSION = 'smg-v1';
 const CORE_ASSETS = [
